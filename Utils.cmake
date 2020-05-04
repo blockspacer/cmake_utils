@@ -310,52 +310,6 @@ macro(add_rapidjson)
   set( RAPIDJSON_DEFINITIONS RAPIDJSON_HAS_STDSTRING=1 RAPIDJSON_HAS_CXX11_RVALUE_REFS=1 )
 endmacro(add_rapidjson)
 
-macro(add_webrtc_definitions)
-  # if (WEBRTC_SRC_PATH)
-  # else()
-  #   message(FATAL_ERROR "WEBRTC_SRC_PATH not set")
-  #   # NOTE: change WEBRTC_SRC_PATH
-  #   # TODO: >>>>>>>>>
-  #   #set(WEBRTC_SRC_PATH "/home/denis/workspace/webrtc-checkout/src")
-  # endif()
-  # if (WEBRTC_TARGET_PATH)
-  # else()
-  #   message(WARNING "using default WEBRTC_TARGET_PATH")
-  #   set(WEBRTC_TARGET_PATH "out/release")
-  # endif()
-  # message("WEBRTC_SRC_PATH=${WEBRTC_SRC_PATH}")
-  # message("WEBRTC_TARGET_PATH=${WEBRTC_TARGET_PATH}")
-  # if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
-  #   OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux"
-  #   OR ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
-
-    set(WEBRTC_DEFINITIONS "-DWEBRTC_POSIX" CACHE INTERNAL "" FORCE)
-  #   set(WEBRTC_LIBRARIES
-  #     #webrtc_full
-  #     #webrtc
-  #     #rtc_p2p
-  #     #jingle_peerconnection_api
-  #     #boringssl
-  #     CACHE INTERNAL "" FORCE)
-  #   set(WEBRTC_LIB_PATHS ${WEBRTC_SRC_PATH}/${WEBRTC_TARGET_PATH}
-  #     ${WEBRTC_SRC_PATH}/${WEBRTC_TARGET_PATH}/obj
-  #     ${WEBRTC_SRC_PATH}/${WEBRTC_TARGET_PATH}/obj/p2p
-  #     ${WEBRTC_SRC_PATH}/${WEBRTC_TARGET_PATH}/obj/api
-  #     #${WEBRTC_SRC_PATH}/${WEBRTC_TARGET_PATH}/obj/third_party/boringssl
-  #     CACHE INTERNAL "" FORCE)
-  # else()
-  # # TODO
-  # # #define WEBRTC_ANDROID 1
-  # # #define WEBRTC_IOS 1
-  # # #define WEBRTC_LINUX 1
-  # # #define WEBRTC_MAC 1
-  # # #define WEBRTC_WIN 1
-  # #
-  # # #define WEBRTC_POSIX 1
-  # message(FATAL_ERROR "System ${CMAKE_SYSTEM_NAME} not supported")
-  # endif()
-endmacro(add_webrtc)
-
 function(add_memcheck_test name binary)
   set(memcheck_command "${CMAKE_MEMORYCHECK_COMMAND} ${CMAKE_MEMORYCHECK_COMMAND_OPTIONS}")
   separate_arguments(memcheck_command)
