@@ -12,6 +12,14 @@ macro(print_cmake_system_info)
   message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
   message(STATUS "CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
   message(STATUS "CMAKE_STATIC_LIBRARY_SUFFIX: ${CMAKE_STATIC_LIBRARY_SUFFIX}")
+
+  message(STATUS "CMAKE_SYSTEM_INFO_FILE: ${CMAKE_SYSTEM_INFO_FILE}")
+  message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
+  message(STATUS "CMAKE_SYSTEM: ${CMAKE_SYSTEM}")
+  message(STATUS "CMAKE_MAKE_PROGRAM: ${CMAKE_MAKE_PROGRAM}")
+
+  message(STATUS "CMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
+  message(STATUS "CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
 endmacro(print_cmake_system_info)
 
 macro(check_supported_os)
@@ -286,16 +294,6 @@ macro(add_rang)
   endif()
 endmacro(add_rang)
 
-#macro(add_abseil)
-#  if(USE_ABSEIL)
-#    option(ABSEIL_FIND_REQUIRED "ABSEIL_FIND_REQUIRED" ON)
-#    findPackageCrossPlatform(Abseil REQUIRED)
-#    message("ABSEIL found at ${ABSEIL_INCLUDE_DIR}")
-#  else()
-#    message(WARNING "RANG turned off!")
-#  endif()
-#endmacro(add_abseil)
-
 macro(add_g3log)
   if(USE_G3LOG)
     option(G3LOG_FIND_REQUIRED "G3LOG_FIND_REQUIRED" ON)
@@ -322,5 +320,37 @@ function(set_memcheck_test_properties name)
   set_tests_properties(memcheck_${name} ${ARGN})
 endfunction(set_memcheck_test_properties)
 
-# Path to root dir (absolute)
-# get_filename_component(ABSOLUTE_ROOT_DIR "${EXA_ROOT}" ABSOLUTE)
+# Determine the number of CPUs to be used so we can call make on existing Makefiles (e.g. RocksDB)
+# with the right level of parallelism.
+# Snippet taken from https://blog.kitware.com/how-many-ya-got/
+function(detect_number_of_processors)
+  if(NOT DEFINED PROCESSOR_COUNT)
+    # Unknown:
+    set(PROCESSOR_COUNT 0)
+
+    # Linux:
+    set(cpuinfo_file "/proc/cpuinfo")
+    if(EXISTS "${cpuinfo_file}")
+      file(STRINGS "${cpuinfo_file}" procs REGEX "^processor.: [0-9]+$")
+      list(LENGTH procs PROCESSOR_COUNT)
+    endif()
+
+    # Mac:
+    if(APPLE)
+      execute_process(COMMAND /usr/sbin/sysctl -n hw.ncpu OUTPUT_VARIABLE PROCESSOR_COUNT)
+      # Strip trailing newline (otherwise it may get into the generated Makefile).
+      string(STRIP "${PROCESSOR_COUNT}" PROCESSOR_COUNT)
+    endif()
+
+    # Windows:
+    if(WIN32)
+      set(PROCESSOR_COUNT "$ENV{NUMBER_OF_PROCESSORS}")
+    endif()
+  endif()
+
+  if (NOT DEFINED PROCESSOR_COUNT OR "${PROCESSOR_COUNT}" STREQUAL "")
+    message(FATAL_ERROR "Could not determine the number of logical CPUs")
+  endif()
+  message("Detected the number of logical CPUs: ${PROCESSOR_COUNT}")
+  set(PROCESSOR_COUNT "${PROCESSOR_COUNT}" PARENT_SCOPE)
+endfunction()
