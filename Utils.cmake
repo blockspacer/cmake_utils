@@ -59,6 +59,16 @@ macro(set_project_version vmajor vminor vpatch)
   set (${PROJECT_NAME}_VERSION "${vmajor}.${vminor}.${vpatch}")
 endmacro(set_project_version)
 
+# USAGE
+#
+# set_if_not_empty(PERFETTO_protozero_plugin_BIN "$ENV{PERFETTO_protozero_plugin_BIN}")
+#
+macro(set_if_not_empty VAR VALUE)
+  if(NOT "${VALUE}" STREQUAL "")
+    set(${VAR} ${VALUE})
+  endif()
+endmacro(set_if_not_empty)
+
 macro(check_cmake_build_type_selected)
   # @see http://www.brianlheim.com/2018/04/09/cmake-cheat-sheet.html
   if ( NOT CMAKE_BUILD_TYPE )
